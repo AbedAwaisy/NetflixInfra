@@ -36,7 +36,3 @@ spec:
     - protocol: TCP
       port: 3000
       targetPort: 3000
-  template:
-    spec:
-      containers:
-        - image: abedawaisy/netflix-frontend:v1.0.20
