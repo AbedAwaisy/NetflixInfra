@@ -34,7 +34,7 @@ pipeline {
                     dir("k8s/NetflixFrontend") {
                         // Update the image in the deployment YAML
                         sh '''
-                            yq eval '.spec.template.spec.containers[0].image = "'"${IMAGE_FULL_NAME_PARAM}"'"' -i deployment-netflix-frontend.yaml
+                            yq eval '(.spec.template.spec.containers[] | select(.name == "netflix-frontend").image) = "'"${IMAGE_FULL_NAME_PARAM}"'"' -i deployment-netflix-frontend.yaml
 
                             # Verify the changes
                             cat deployment-netflix-frontend.yaml
