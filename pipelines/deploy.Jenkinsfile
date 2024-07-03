@@ -38,14 +38,18 @@ pipeline {
 
                             # Verify the changes
                             cat deployment-netflix-frontend.yaml
-
-                            # Add and commit the changes
-                            git config --global user.name "Abed Awaisy"
-                            git config --global user.email "abed.awaisy.a@gmail.com"
-                            git add deployment-netflix-frontend.yaml
-                            git commit -m "Update image to ${IMAGE_FULL_NAME_PARAM}"
-                            git push origin HEAD:main
                         '''
+
+                        // Commit and push the changes
+                        withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                            sh '''
+                                git config --global user.name "Abed Awaisy"
+                                git config --global user.email "abed.awaisy.a@gmail.com"
+                                git add deployment-netflix-frontend.yaml
+                                git commit -m "Update image to ${IMAGE_FULL_NAME_PARAM}"
+                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/AbedAwaisy/NetflixInfra.git HEAD:main
+                            '''
+                        }
                     }
                 }
             }
