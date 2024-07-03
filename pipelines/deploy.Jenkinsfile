@@ -30,8 +30,8 @@ pipeline {
                 script {
                     // Ensure yq is available in the PATH
                     env.PATH = "${env.HOME}/bin:${env.PATH}"
-                    // Change to the directory corresponding to the service name
-                    dir("${params.SERVICE_NAME}") {
+                    // Change to the directory containing the deployment YAML
+                    dir("k8s/NetflixFrontend") {
                         // Update the image in the deployment YAML
                         sh '''
                             yq eval '.spec.template.spec.containers[0].image = env.IMAGE_FULL_NAME_PARAM' -i deployment-netflix-frontend.yaml
