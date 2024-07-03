@@ -3,24 +3,32 @@ pipeline {
         label 'general'
     }
     parameters {
-        string(name: 'SERVICE_NAME', defaultValue: '', description: '')
-        string(name: 'IMAGE_FULL_NAME_PARAM', defaultValue: '', description: '')
+        string(name: 'SERVICE_NAME', defaultValue: '', description: 'The name of the service to deploy')
+        string(name: 'IMAGE_FULL_NAME_PARAM', defaultValue: '', description: 'The full Docker image name to deploy')
     }
 
     stages {
         stage('Deploy') {
             steps {
-                /*
+                script {
+                    // Change to the directory corresponding to the service name
+                    dir("${params.SERVICE_NAME}") {
+                        // Update the image in the deployment YAML
+                        sh '''
+                            yq eval '.spec.template.spec.containers[0].image = "${IMAGE_FULL_NAME_PARAM}"' -i deployment.yaml
 
-                Now your turn! implement the pipeline steps ...
+                            # Verify the changes
+                            cat deployment.yaml
 
-                - `cd` into the directory corresponding to the SERVICE_NAME variable.
-                - Change the YAML manifests according to the new $IMAGE_FULL_NAME_PARAM parameter.
-                  You can do so using `yq` or `sed` command, by a simple Python script, or any other method.
-                - Commit the changes, push them to GitHub.
-                   * Setting global Git user.name and user.email in 'Manage Jenkins > System' is recommended.
-                   * Setting Shell executable to `/bin/bash` in 'Manage Jenkins > System' is recommended.
-                */
+                            # Add and commit the changes
+                            git config --global user.name "Abed Awaisy"
+                            git config --global user.email "abed.awaisy.a@gmail.com"
+                            git add deployment.yaml
+                            git commit -m "Update image to ${IMAGE_FULL_NAME_PARAM}"
+                            git push origin HEAD:main
+                        '''
+                    }
+                }
             }
         }
     }
