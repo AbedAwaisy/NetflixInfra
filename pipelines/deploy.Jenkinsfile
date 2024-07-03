@@ -8,33 +8,14 @@ pipeline {
     }
 
     stages {
-        stage('Install yq') {
-            steps {
-                sh '''
-                    if ! command -v yq &> /dev/null
-                    then
-                        echo "yq could not be found, installing..."
-                        mkdir -p ${HOME}/bin
-                        curl -L https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_amd64 -o ${HOME}/bin/yq
-                        chmod +x ${HOME}/bin/yq
-                        export PATH=${HOME}/bin:$PATH
-                    else
-                        echo "yq is already installed"
-                    fi
-                '''
-            }
-        }
-
         stage('Deploy') {
             steps {
                 script {
-                    // Ensure yq is available in the PATH
-                    env.PATH = "${env.HOME}/bin:${env.PATH}"
                     // Change to the directory containing the deployment YAML
                     dir("k8s/NetflixFrontend") {
-                        // Update the image in the deployment YAML
+                        // Update the image in the deployment YAML using sed
                         sh '''
-                            yq e 'select(.kind == "Deployment") | .spec.template.spec.containers[] | select(.name == "netflix-frontend").image = "'"${IMAGE_FULL_NAME_PARAM}"'"' -i deployment-netflix-frontend.yaml
+                            sed -i 's|image: .*|image: ${IMAGE_FULL_NAME_PARAM}|' deployment-netflix-frontend.yaml
 
                             # Verify the changes
                             cat deployment-netflix-frontend.yaml
