@@ -8,9 +8,28 @@ pipeline {
     }
 
     stages {
+        stage('Install yq') {
+            steps {
+                sh '''
+                    if ! command -v yq &> /dev/null
+                    then
+                        echo "yq could not be found, installing..."
+                        mkdir -p ${HOME}/bin
+                        curl -L https://github.com/mikefarah/yq/releases/download/v4.6.3/yq_linux_amd64 -o ${HOME}/bin/yq
+                        chmod +x ${HOME}/bin/yq
+                        export PATH=${HOME}/bin:$PATH
+                    else
+                        echo "yq is already installed"
+                    fi
+                '''
+            }
+        }
+
         stage('Deploy') {
             steps {
                 script {
+                    // Ensure yq is available in the PATH
+                    env.PATH = "${env.HOME}/bin:${env.PATH}"
                     // Change to the directory corresponding to the service name
                     dir("${params.SERVICE_NAME}") {
                         // Update the image in the deployment YAML
