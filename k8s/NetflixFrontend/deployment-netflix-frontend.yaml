@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: netflix-frontend
-          image: abedawaisy/netflix-frontend:v1.0.29
+          image: abedawaisy/netflix-frontend:v1.0.30
           ports:
             - containerPort: 3000
           env:
